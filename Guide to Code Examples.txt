@@ -1,0 +1,84 @@
+Guide to Cython Code Examples:
+
+# Author: Zak Fallows (zakf@mit.edu)
+# Copyright 2013
+# Released for free use under the Creative Commons - Attribution license (CC-BY)
+# If you reuse this material, please remember to give me credit.
+
+#================================== setup.py ==================================#
+
+setup.py is the build automation file. You use it to compile the Cython code into C and then into machine code. It uses the Python standard library called Distutils.
+
+#=============================== def_types.pxi ================================#
+
+Defines 8 useful integer types. To use it in another .pyx file, just include it:
+
+include "def_types.pxi"
+
+cdef uint64 my_num = 1234
+
+#============================== Example 1, ex1* ===============================#
+
+Example 1 shows basic Cython syntax.
+
+ex1.py:
+    A simple Python module.
+
+ex1_t.pyx:
+    A typed Cython module that does exactly the same thing.
+
+#============================== Example 2, ex2* ===============================#
+
+Example 2 is intended to show that C functions are much faster than Python functions. There are two reasons C functions are faster, they are discussed in the slides.
+
+ex2.py:
+    This file actually performs the benchmarks. This file imports the other files, runs them, and times them.
+
+ex2_u.pyx:
+    This file shows that untyped Cython is somewhat faster than interpreted Python. Specifically, this example is 3x as fast. This file contains copy-pasted code from ex2.py, this is "pure Python" but it is compiled rather than interpreted. It is fully dynamic, just like Python, and that I why it is only 3x as fast.
+
+ex2_t.pyx:
+    This file shows that typed Cython (0.2 seconds) is somewhat faster than untyped Cython (0.4 seconds, see ex2_u.pyx) and significantly faster than interpreted Python (1.3 seconds, see ex2.py).
+    
+    This file also shows that C functions are much faster than Python functions. The C function ext2_t.inner2_t() is at least 7x as fast as the Python function ex2_u.inner_u() despite the fact that the C function actually does a lot of math, whereas the Python function does nothing at all.
+    
+    It was necessary to make inner2_t() do math because otherwise GCC likes to completely ignore it. GCC is smart, it ignores code that does absolutely nothing.
+
+#============================== Example 3, ex3* ===============================#
+
+Example 3 shows that adding static types makes things faster, and replacing Python functions with C functions also makes things faster.
+
+ex3.py:
+    This file actually performs the benchmarks. This file imports the other files, runs them, and times them.
+
+ex3_u.pyx:
+    This file shows that untyped Cython is somewhat faster than interpreted Python.
+
+ex2_t.pyx:
+    This file shows that typed Cython is faster than untyped Cython. This file also shows that C functions are faster than Python functions.
+
+#============================== Example 4, ex4* ===============================#
+
+Example 4 shows some other features of Cython.
+
+ex4.py:
+    This file exists for convenience when playing with Cython. All it does is import ex4_t. You cannot use reload(module) to reload a compiled Cython module (this is unlike interpreted Python), so I like to make a wrapper like ex4.py. Now, the write-compile-test loop is:
+        
+        mac> python setup.py build_ext --inplace
+        
+        mac> python ex4.py
+        
+        # It prints some test results.
+        
+        # I edit the .pyx files.
+        
+        Repeat
+
+ex4_t.pyx:
+    This is the "meat" of example 4.
+
+ex4_other.pyx:
+    This is another Cython module that is both cimported and imported by ex4_t.pyx.
+
+ex4_other.pxd:
+    This is like a .h file for ex4_other.pyx, it says what declarations should be shared with outside .pyx files.
