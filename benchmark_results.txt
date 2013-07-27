@@ -1,0 +1,68 @@
+Results of Example 2:
+
+# Author: Zak Fallows (zakf@mit.edu)
+# Copyright 2013
+# Released for free use under the Creative Commons - Attribution license (CC-BY)
+# If you reuse this material, please remember to give me credit.
+
+
+#============================= Example 2, ex2.py ==============================#
+
+# The following is what printed on my Mac when I ran ex2.py:
+
+Interpreted Python:
+    Time: 1.38237094879 seconds
+
+Untyped Cython:
+    Time: 0.438313007355 seconds
+    Ratio: 3.154
+
+Typed Cython, Python Function:
+    Time: 0.208416938782 seconds
+    Ratio: 6.633
+
+Typed Cython, C Function:
+    Time: 9.53674316406e-07 seconds
+    Ratio: 1449521.000
+
+# That is an implausibly large speed boost.
+# By inspecting the C code output by Cython, I can see that the 
+# C code really does call the function 10,000,000 times. So the 
+# speed boost probably comes from either the compiler inlining 
+# the function, or more likely, the compiler (in my case GCC) 
+# noticed that the result is unused so it completely skipped 
+# this piece of code, it generated no corresponding machine code 
+# at all. GCC is too smart for us!
+
+Typed Cython, C Function, Fudged:
+    Time: 0.0279951095581 seconds
+    Ratio: 49.379
+
+
+#============================= Example 3, ex3.py ==============================#
+
+# The following is what printed on my Mac when I ran ex3.py:
+
+Interpreted Python:
+    Result = 11611
+    Time: 3.67643713951 seconds
+
+Untyped Cython:
+    Result = 11611
+    Time: 1.72477602959 seconds
+    Ratio: 2.132
+
+Typed Cython, Python Functions:
+    Result = 11611
+    Time: 1.40393590927 seconds
+    Ratio: 2.619
+
+Typed Cython, Python Functions II:
+    Result = 11611
+    Time: 1.02636504173 seconds
+    Ratio: 3.582
+
+Typed Cython, C Functions:
+    Result = 11611
+    Time: 0.0388560295105 seconds
+    Ratio: 94.617
